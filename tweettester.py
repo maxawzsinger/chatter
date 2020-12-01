@@ -2,9 +2,15 @@ import twint
 from datetime import timedelta, date
 import random
 
+from alpha_vantage.timeseries import TimeSeries
+
+
+
+
+
 def tweetscrape(stock_list, window):
 
-	#stock_list is list of strings of format '$AAPL'
+	#stock_list is list of strings of format 'AAPL'
 	#window should be integer of either 1, 7, 30, 183, 365 (days)
 
 	#producing date string for config 
@@ -28,7 +34,7 @@ def tweetscrape(stock_list, window):
 	for stock in stock_list:
 
 
-		c.Search=stock
+		c.Search= '$'+stock #$ added for twitter
 
 
 		twint.run.Search(c)
@@ -70,6 +76,11 @@ def tweetscrape(stock_list, window):
 					mentions[tweet.timestamp] += 1
 
 		stock_series[stock] = mentions
+
+
+	ts = TimeSeries(key='JCLZ7M60COAOXC66') #my unique alphavantage key
+	data, meta_data = ts.get_intraday(stock)	
+
 
 	return stock_series,stock_examples
 
