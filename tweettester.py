@@ -1,7 +1,7 @@
 import twint 
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import random
-
+import pandas as pd
 from alpha_vantage.timeseries import TimeSeries
 
 
@@ -9,6 +9,11 @@ from alpha_vantage.timeseries import TimeSeries
 
 
 def tweetscrape(stock_list, window):
+
+	stock_series = {} #1st return value - holds time series 
+	stock_examples = {} #2nd return value - holds random tweets for each stock as decoration
+
+
 
 	#stock_list is list of strings of format 'AAPL'
 	#window should be integer of either 1, 7, 30, 183, 365 (days)
@@ -23,10 +28,12 @@ def tweetscrape(stock_list, window):
 	c.Hide_output = True
 	c.Store_object = True
 
+	#alphavantage config
 
-	stock_series = {} #holds time series 
+	ts = TimeSeries(key='JCLZ7M60COAOXC66') #my unique alphavantage key
 
-	stock_examples = {} #holds random tweets for each stock as decoration
+
+
 
 	#iterating over stock list, storing in stock_series
 	#as {stock:{date:mentions, date:mentions}}
@@ -63,32 +70,74 @@ def tweetscrape(stock_list, window):
 			#iterating over tweets list adding up mentions in mentions dict
 			mentions = {}
 
-			# for tweet in tweets:
-			# 	if tweet.datestamp not in mentions:
-			# 		mentions[tweet.datestamp] = 0
-			# 	else:
-			# 		mentions[tweet.datestamp] += 1
-
 			for tweet in tweets:
-				if tweet.timestamp not in mentions:
-					mentions[tweet.timestamp] = 0
+				tweet_datetime = tweet.datestamp + ' ' + tweet.timestamp
+				if tweet_datetime not in mentions:
+					mentions[tweet_datetime] = 1
 				else:
-					mentions[tweet.timestamp] += 1
+					mentions[tweet_datetime] += 1
 
 		stock_series[stock] = mentions
 
+		# pulling data from alpha_vantage
 
-	ts = TimeSeries(key='JCLZ7M60COAOXC66') #my unique alphavantage key
-	data, meta_data = ts.get_intraday(stock)	
+		data, meta_data = ts.get_intraday(stock)
+
+		#combining data - "time windows" created by the alpha vantage times
+		tweets_vs_stock = {}
+
+		pruned_mentions = mentions #size will change during iteration, stores a record
+		tweet_mentions = mentions
+		for stock_time, prices in data.items():
+
+			stock_dt = datetime.strptime(stock_time,
+                           '%Y-%m-%d %H:%M:%S')
+			stock_ssepoch = stock_dt.timestamp()
+
+			close_price = prices['4. close']
+
+			new_stock_time = True
+
+			for tweet_time, tweet_vol in tweet_mentions.items():
+				#convert key to comparable dt object (currently only a time no date)
+				tweet_dt = datetime.strptime(tweet_time,
+                           '%Y-%m-%d %H:%M:%S')
+				tweet_ssepoch = tweet_dt.timestamp()
+
+				if tweet_ssepoch > stock_ssepoch:
+
+					if new_stock_time:
+						tweets_vs_stock[stock_time] = {
+						'price':close_price,
+						'tweet_vol' : tweet_vol
+						}
+
+						new_stock_time = False
+						del pruned_mentions[tweet_time]
+					else:
+						tweets_vs_stock[stock_time]['tweet_vol'] += tweet_vol
+						del pruned_mentions[tweet_time]
+				else:
+					break
+			tweet_mentions = pruned_mentions
 
 
-	return stock_series,stock_examples
+
+
+
+
+
+
+
+
+
+	return stock_series,stock_examples, tweets_vs_stock
 
 
 #test
 
-stock_list = ['$TSLA']
-window = 1
+stock_list = ['TSLA']
+window = 1 #change this to grab tweets from same range as the alphavantage..
 
 print('window: ', window)
 
