@@ -3,10 +3,13 @@ from datetime import timedelta, date, datetime
 import random
 import pandas as pd
 from alpha_vantage.timeseries import TimeSeries
+from pytz import timezone
+
 
 
 import pandas as pd
 
+#some important values:
 
 
 
@@ -79,10 +82,12 @@ def tweetscrape(stock_list, window):
 				tweet_dt = datetime.strptime(tweet.datestamp+ tweet.timestamp, '%Y-%m-%d%H:%M:%S') #tweet[0] is time
 				tweet_ssepoch = tweet_dt.timestamp()
 
-				if tweet_ssepoch not in mentions:
-					mentions[tweet_ssepoch] = 1
-				else:
-					mentions[tweet_ssepoch] += 1
+				if tweet.timestamp >= '04:00:00' and tweet.timestamp <= '20:00:00':
+
+					if tweet_ssepoch not in mentions:
+						mentions[tweet_ssepoch] = 1
+					else:
+						mentions[tweet_ssepoch] += 1
 			#there are sometimes duplicates on same timestamp, this stacks duplicates on top of each other
 
 
@@ -99,7 +104,7 @@ def tweetscrape(stock_list, window):
 
 		# pulling data from alpha_vantage
 
-		data, meta_data = ts.get_intraday(stock)
+		data, meta_data = ts.get_intraday(stock, interval='1min')
 
 		# pruned_mentions = mentions #size will change during iteration, stores a record
 		# tweet_mentions = mentions
@@ -115,8 +120,6 @@ def tweetscrape(stock_list, window):
 
 		start_index = 0 #allow for loop to look at smaller and smaller subsample
 
-		for s, p in ssepoch_stocks.items():
-			print(s)
 
 		for ssepoch, price in ssepoch_stocks.items():
 
@@ -153,6 +156,7 @@ def tweetscrape(stock_list, window):
 			print('successfully broke')
 
 
+
 			
 			#CHANGE WINDOW TO BE
 
@@ -168,9 +172,10 @@ def tweetscrape(stock_list, window):
 
 
 
-
-
 	return tweets_vs_stock
+
+	# for time, values in tweets_vs_stock.items():
+	# 	if
 
 
 
@@ -209,7 +214,9 @@ print(df)
 
 lines = df.plot.line()
 
-df.to_csv(r'/Users/stu/Desktop/tweettest/tweet/chatter/chatter/stonks2.csv')
+df.to_csv(r'/Users/stu/Desktop/tweettest/tweet/chatter/chatter/stonks3.csv')
+
+
 
 
 
