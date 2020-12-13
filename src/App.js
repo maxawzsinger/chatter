@@ -7,11 +7,13 @@ function App() {
   return (
     <div className="wrapper">
       <div className = "titlebar">
+        tweets vs. stock
       </div>
-      <div className = "optionsbar">
-        <OptionsBar>
-        </OptionsBar>
+      <div className = "options">
+          <OptionsBar>
+        </OptionsBar>      
       </div>
+
       <div className = "graph">
       </div>
       <div className = "legend">

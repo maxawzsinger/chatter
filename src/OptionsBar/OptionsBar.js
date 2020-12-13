@@ -13,12 +13,14 @@ const [period, setPeriod] = useState(1) //days
 
 
   return (
-    <div className="optionsbarsubgrid">
+    <div className = "optionsbar">
       <div className = "search">
         <ValidationTextFields>
         </ValidationTextFields>
       </div>
       <div className = "time">
+        <ValidationTextFields>
+        </ValidationTextFields>
       </div>
     </div>
   );
