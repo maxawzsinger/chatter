@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import ValidationTextFields from './TextFieldMUI.js';
+import './styles.css';
+import OutlinedButton from './MedButtonMUI.js';
+
 
 
 function OptionsBar() {
@@ -19,8 +22,12 @@ const [period, setPeriod] = useState(1) //days
         </ValidationTextFields>
       </div>
       <div className = "time">
-        <ValidationTextFields>
-        </ValidationTextFields>
+        <OutlinedButton>
+        </OutlinedButton>
+      </div>
+      <div className = "load">
+         <OutlinedButton>
+        </OutlinedButton> 
       </div>
     </div>
   );

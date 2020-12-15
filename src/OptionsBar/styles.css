@@ -1,0 +1,31 @@
+.optionsbar { 
+	display: grid;
+	grid-template-columns: 10fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	gap:2px;
+	grid-template-areas:
+	"search time"
+	"search load";
+	margin: 0;
+	padding: 0;
+	vertical-align: center;
+}
+
+/*optionsbar nested grid*/
+
+.search {
+	grid-area: search;
+	position: relative;
+	top: 10%;
+
+}
+
+.time {
+	grid-area: time;
+
+
+}
+
+.load {
+	grid-area: load;
+}
